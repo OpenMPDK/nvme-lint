@@ -1,0 +1,7 @@
+*.pyc
+output.yaml
+ignore*.txt
+target*.txt
+build/
+dist/
+*.egg-info/
