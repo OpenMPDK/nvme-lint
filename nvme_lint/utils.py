@@ -7,6 +7,7 @@ Utilities for nvme-lint
 """
 import logging
 from pathlib import Path
+from itertools import tee
 import os
 
 log_level = logging.INFO
@@ -54,3 +55,11 @@ def config_log_level(user_level):
         logging.warning("Logging level unrecognized, defaulting to INFO")
     else:
         log_level = level
+
+
+# from https://docs.python.org/3.8/library/itertools.html
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)

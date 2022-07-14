@@ -5,7 +5,7 @@ SPDX-License-Identifier: GPLv2-or-later or Apache-2.0
 
 Extract captions from all figures in the NVMe specification
 """
-from itertools import chain, pairwise
+from itertools import chain
 import re
 import subprocess
 
@@ -117,7 +117,7 @@ def remove_empty_elements(elements):
 def concat_dashed_elements(elements):
     """Remove false linebreaks caused by a dash"""
     skip = False
-    for first, second in pairwise(chain(elements, [None])):
+    for first, second in utils.pairwise(chain(elements, [None])):
         if skip:
             skip = False
         elif second is None:
