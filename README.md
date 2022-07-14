@@ -77,3 +77,6 @@ During the process `nvme-lint` checks for the following:
 ### Logging
 The messages from `nvme-lint` will be outputted to the terminal and the file `nvme-lint.log`.
 This file is placed in `$XDG_DATA_HOME/nvme-lint/`, if `$XDG_DATA_HOME` is in the environment. Otherwise, it will be placed in `~/.local/share/nvme-lint/`.
+
+## License
+All software contained within this repository is dual licensed under the GNU General Public License version 2 or later or the Apache-2.0 license. See COPYING and LICENSE for more information.

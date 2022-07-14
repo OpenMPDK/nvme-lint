@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Copyright (c) 2022 Samsung Electronics Co., Ltd
-SPDX-License-Identifier: Apache-2.0
+SPDX-License-Identifier: GPLv2-or-later or Apache-2.0
 
 Utilities for nvme-lint
 """
