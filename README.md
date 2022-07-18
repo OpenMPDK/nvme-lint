@@ -5,6 +5,13 @@
 ## Getting started
 
 ### Dependencies
+On Debian these packages are required:
+```
+python
+pip
+poppler-utils
+libgl1
+```
 
 Before you can start using `nvme-lint` you must have `pdftohtml` in your PATH.
 Write the command `pdftohtml -v` to verify that it is available.
@@ -22,6 +29,11 @@ To validate a NVMe specification file run the command:
   nvme-lint file_name
 ``` 
 
+You can also run the tool directly from the source directory with the command:
+
+```
+  python -m nvme_lint
+```
 
 ## How it works
 nvme-lint will extract every table from a NVMe specification pdf file, unless a target- or ignore-file is provided.
