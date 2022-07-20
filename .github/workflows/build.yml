@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  release:
+    types: [published]
+
+jobs:
+  test_cython:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.10"
+    - name: Install Python dependencies
+      run: |
+        pip install wheel
+    - name: Build
+      run: |
+        python setup.py build
+    - name: Build and upload wheel
+      if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
+      run: |
+        echo "Building wheel and uploading"
+        pip install wheel twine
+        python setup.py sdist bdist_wheel
+        echo "Uploading source code"
+        python -m twine upload --non-interactive --skip-existing -u '__token__' -p ${{ secrets.PYPI_API_TOKEN }} dist/*
