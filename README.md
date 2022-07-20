@@ -7,10 +7,10 @@
 ### Dependencies
 On Debian these packages are required:
 ```
-python
-pip
-poppler-utils
-libgl1
+  python
+  pip
+  poppler-utils
+  libgl1
 ```
 
 Before you can start using `nvme-lint` you must have `pdftohtml` in your PATH.
@@ -18,9 +18,10 @@ Write the command `pdftohtml -v` to verify that it is available.
 
 ### Installation
 
-- Download the source archive from the latest release
-
-- Install the source archive by running `pip install nvme-lint-x.x.x.tar.gz`
+- Install by running:
+```
+  pip install nvme-lint
+```
 
 ### Usage
 
