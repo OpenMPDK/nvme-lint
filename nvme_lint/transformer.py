@@ -127,10 +127,10 @@ class Table(list):
                 row[heading] = row[heading][0] - row[heading][1] + 1
 
     def check_order(self):
-        """Check that bits go from high to low and bytes from low to high"""
-        if "bits" in self.headings and len(self.rows) > 1 and sorted(self.rows, key=lambda row: row["bits"][0]) == self.rows:
+        """Check that bits go from high to low and hex values and bytes from low to high"""
+        if "bits" in self.headings and len(self.rows) > 1 and sorted(self.rows, key=lambda row: row["bits"][0], reverse=True) != self.rows:
             logger.warning(f"{self.title}: bits are in wrong order")
-        elif "bytes" in self.headings and len(self.rows) > 1 and sorted(self.rows, key=lambda row: row["bytes"][0], reverse=True) == self.rows:
+        elif "bytes" in self.headings and len(self.rows) > 1 and sorted(self.rows, key=lambda row: row["bytes"][0]) != self.rows:
             logger.warning(f"{self.title}: bytes are in wrong order")
 
     def check_sum(self, heading):

@@ -37,6 +37,20 @@ half_bytes_table = transformer.Table("test table", [
         {"bytes": [14,11]},
     ])
 
+unordered_bits_table = transformer.Table("test table", [
+        {"bits": [15,8]},
+        {"bits": [31,16]},
+        {"bits": [7,4]},
+        {"bits": [3,0]},
+    ])
+
+unordered_bytes_table = transformer.Table("test table", [
+        {"bytes": [3,0]},
+        {"bytes": [15,8]},
+        {"bytes": [7,4]},
+        {"bytes": [31,16]},
+    ])
+
 healthy_bits_table = transformer.Table("test table", [
         {"bits": [31,16]},
         {"bits": [15,8]},
@@ -48,7 +62,7 @@ healthy_bytes_table = transformer.Table("test table", [
         {"bytes": [3,0]},
         {"bytes": [7,4]},
         {"bytes": [15,8]},
-        {"bytes": [31,16]}
+        {"bytes": [31,16]},
     ])
 
 
@@ -67,9 +81,11 @@ def test_calculate_bits(table, result, type, caplog):
 
 
 @pytest.mark.parametrize("table, result", [(deepcopy(bits_table), "bits are in wrong order"),
+                                           (deepcopy(unordered_bits_table), "bits are in wrong order"),
                                            (deepcopy(healthy_bits_table), ""),
                                            (deepcopy(half_bits_table), ""),
                                            (deepcopy(bytes_table), "bytes are in wrong order"),
+                                           (deepcopy(unordered_bytes_table), "bytes are in wrong order"),
                                            (deepcopy(healthy_bytes_table), ""),
                                            (deepcopy(half_bytes_table), "")])
 def test_check_order(table, result, caplog):
