@@ -44,6 +44,10 @@ class Table(list):
             if not row["children"]:
                 del row["children"]
 
+        # Remove heading if no children are present in the entire table
+        if all("children" not in row.keys() for row in self.rows):
+            self.headings.remove("children")
+
     def enforce_headings(self):
         """Make sure that that every row aligns with the headings e.g. has either 'bits', 'bytes' or 'value'"""
         if "bits" in self.headings:
