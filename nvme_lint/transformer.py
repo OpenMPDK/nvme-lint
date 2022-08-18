@@ -134,8 +134,11 @@ class Table(list):
         """Check that bits go from high to low and hex values and bytes from low to high"""
         if "bits" in self.headings and len(self.rows) > 1 and sorted(self.rows, key=lambda row: row["bits"][0], reverse=True) != self.rows:
             logger.warning(f"{self.title}: bits are in wrong order")
+            self.rows = sorted(self.rows, key=lambda row: row["bits"][0], reverse=True)
+
         elif "bytes" in self.headings and len(self.rows) > 1 and sorted(self.rows, key=lambda row: row["bytes"][0]) != self.rows:
             logger.warning(f"{self.title}: bytes are in wrong order")
+            self.rows = sorted(self.rows, key=lambda row: row["bytes"][0])
 
     def check_sum(self, heading):
         """Check that the sum of bits and bytes is a power of 2"""
