@@ -137,3 +137,50 @@ def test_check_for_holes(table, result, type, caplog):
         assert caplog.text == ""
     else:
         assert result in caplog.text
+
+
+def test_detect_hex_columns():
+    undetected_hex_table_1 = transformer.Table("test table", [
+        {"value": "20h", "description": "This shouldn't be changed 20h"},
+        {"value": "80h", "description": "80h This shouldn't be changed"},
+        {"value": "90h", "description": "This shouldn't 90h be changed"},
+    ])
+
+    detected_hex_table_1 = transformer.Table("test table", [
+        {"hex-value": "20h", "description": "This shouldn't be changed 20h"},
+        {"hex-value": "80h", "description": "80h This shouldn't be changed"},
+        {"hex-value": "90h", "description": "This shouldn't 90h be changed"},
+    ])
+
+    undetected_hex_table_2 = transformer.Table("test table", [
+        {"heading with spaces": "30h to F0h", "description": "This shouldn't be changed 30h to F0h"},
+        {"heading with spaces": "F1h to FAh", "description": "F1h to FAh This shouldn't be changed"},
+        {"heading with spaces": "FBh to 1AAh", "description": "This shouldn't FBh to 1AAh be changed"},
+    ])
+    detected_hex_table_2 = transformer.Table("test table", [
+        {"hex-heading with spaces": "30h to F0h", "description": "This shouldn't be changed 30h to F0h"},
+        {"hex-heading with spaces": "F1h to FAh", "description": "F1h to FAh This shouldn't be changed"},
+        {"hex-heading with spaces": "FBh to 1AAh", "description": "This shouldn't FBh to 1AAh be changed"},
+    ])
+
+    undetected_hex_table_3 = transformer.Table("test table", [
+        {"w3i?d he4d1/g": "ABh"},
+        {"w3i?d he4d1/g": "80Ah"},
+        {"w3i?d he4d1/g": "All Others"},
+    ])
+    detected_hex_table_3 = transformer.Table("test table", [
+        {"hex-w3i?d he4d1/g": "ABh"},
+        {"hex-w3i?d he4d1/g": "80Ah"},
+        {"hex-w3i?d he4d1/g": "All Others"},
+    ])
+
+    undetected_hex_table_1.detect_hex_columns()
+    undetected_hex_table_2.detect_hex_columns()
+    undetected_hex_table_3.detect_hex_columns()
+
+    assert(undetected_hex_table_1.rows == detected_hex_table_1.rows)
+    assert(undetected_hex_table_1.headings == detected_hex_table_1.headings)
+    assert(undetected_hex_table_2.rows == detected_hex_table_2.rows)
+    assert(undetected_hex_table_2.headings == detected_hex_table_2.headings)
+    assert(undetected_hex_table_3.rows == detected_hex_table_3.rows)
+    assert(undetected_hex_table_3.headings == detected_hex_table_3.headings)

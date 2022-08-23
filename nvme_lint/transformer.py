@@ -12,6 +12,10 @@ from . import utils
 
 logger = utils.get_logger("Transformer")
 
+# Regex to find hexadecimal numbers and ranges
+hex_value = re.compile(r"^[0-9A-F]+h$")
+hex_range = re.compile(r"^[0-9A-F]+h to [0-9A-F]+h$")
+
 
 class Table(list):
     """Class to facilitate chaining of transformations"""
@@ -33,11 +37,6 @@ class Table(list):
         else:
             return list(self.rows[0].keys())
 
-    def remove_value_ranges(self):
-        """Remove values including the word 'to'"""
-        if "value" in self.headings:
-            self.rows = [row for row in self.rows if "to" not in row["value"]]
-
     def remove_empty_children(self):
         """Remove key 'children' if the list is empty"""
         for row in self.rows:
@@ -49,13 +48,12 @@ class Table(list):
             self.headings.remove("children")
 
     def enforce_headings(self):
-        """Make sure that that every row aligns with the headings e.g. has either 'bits', 'bytes' or 'value'"""
+        """Remove rows that do not align with the headings,
+        e.g. if 'bits' are in the headings, remove rows that do not have 'bits'"""
         if "bits" in self.headings:
             self.rows = [row for row in self.rows if row.get("bits")]
         elif "bytes" in self.headings:
             self.rows = [row for row in self.rows if row.get("bytes")]
-        elif "value" in self.headings:
-            self.rows = [row for row in self.rows if row.get("value")]
 
     def generate_name(self):
         """Generate a value for the 'name' key if it doesn't exist"""
@@ -71,12 +69,6 @@ class Table(list):
                     name = row["definition"] if "definition" in row else row.get("description", "skip")
                     row["name"] = name.lower().replace(" ", "_")
 
-    def convert_values_to_hex(self):
-        """Convert values to hexadecimal"""
-        if "value" in self.headings:
-            for row in self.rows:
-                row["value"] = "0x" + row["value"].strip("h")
-
     def process_title(self):
         """Convert the title to number, group and title or number and title"""
         number_group_title = re.compile(r"Figure (?P<number>\d+): (?P<group>.+) \u2013 (?P<title>.+)")
@@ -91,7 +83,7 @@ class Table(list):
 
     def determine_c_type(self):
         """Determine whether group is an enum or struct"""
-        if "value" in self.headings:
+        if [heading for heading in self.headings if "hex-" in heading]:
             self.c_type = "enum"
         else:
             self.c_type = "struct"
@@ -174,6 +166,44 @@ class Table(list):
         if "bits" in self.headings:
             self.rows = list(reversed(self.rows))
 
+    def clean_hex(self):
+        """Clean up hex values and remove non hex values from hex columns"""
+        self.detect_hex_columns()
+        for heading in [heading for heading in self.headings if "hex-" in heading]:
+            self.rows = [row for row in self.rows
+                         if hex_value.match(row[heading])
+                         or hex_range.match(row[heading])]
+            self.remove_hex_ranges(heading)
+            self.change_hex_format(heading)
+
+    def detect_hex_columns(self):
+        """Change headings of columns with hex values to 'hex'"""
+        headings_to_change = set()
+        for row in self.rows:
+            for i, heading in enumerate(self.headings):
+                try:
+                    if hex_value.match(row.get(heading)) or hex_range.match(row.get(heading)):
+                        headings_to_change.add(i)
+                except TypeError:
+                    continue
+
+        for index in headings_to_change:
+            old_heading = self.headings[index]
+            for row in self.rows:
+                row[f"hex-{old_heading}"] = row[old_heading]
+                del row[old_heading]
+
+            self.headings[index] = f"hex-{old_heading}"
+
+    def remove_hex_ranges(self, heading):
+        """Remove hex ranges as they're"""
+        self.rows = [row for row in self.rows if not hex_range.match(row[heading])]
+
+    def change_hex_format(self, heading):
+        """Change hex format from {n}h to 0x{n}"""
+        for row in self.rows:
+            row[heading] = "0x" + row[heading].strip("h")
+
     def process_children(self):
         """Apply relevant functions to child table"""
         for row in self.rows:
@@ -185,9 +215,8 @@ class Table(list):
                 method_names = ["remove_empty_children",
                                 "enforce_headings",
                                 "clean_bits_and_bytes",
-                                "reverse_bits_rows",
-                                "remove_value_ranges",
-                                "convert_values_to_hex", ]
+                                "clean_hex",
+                                "reverse_bits_rows"]
 
                 for name in method_names:
                     try:
@@ -206,9 +235,8 @@ def transform(tables):
         method_names = ["remove_empty_children",
                         "enforce_headings",
                         "clean_bits_and_bytes",
+                        "clean_hex",
                         "reverse_bits_rows",
-                        "remove_value_ranges",
-                        "convert_values_to_hex",
                         "generate_name",
                         "process_title",
                         "determine_spec_type",

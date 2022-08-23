@@ -53,12 +53,6 @@ def parse_headings(row):
             headings[i] = "bytes"
             logger.warning(f"'{heading}' instead of 'bytes'")
 
-    # clean-up headings containing value - this is for practical reasons
-    for i, heading in enumerate(headings):
-        if heading != "value" and "value" in heading:
-            headings[i] = "value"
-            logger.debug(f"Normalized '{heading}' to 'value'")
-
     return headings
 
 
