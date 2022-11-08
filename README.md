@@ -1,3 +1,7 @@
+# This repository has changed location
+
+All future development will be done in [linux-nvme/nvme-lint](https://github.com/linux-nvme/nvme-lint).
+
 # nvme-lint
 
 `nvme-lint` is a tool that uses [Camelot-py](https://github.com/camelot-dev/camelot) and [Poppler](https://github.com/freedesktop/poppler) to validate tables in NVMe specification documents.
